@@ -94,7 +94,7 @@ Imagine configuration:
       proxy_pass https://$endpoint/;
   }
 
-In this case nginx will resolve ``api.com`` once at startup with system resolver and then never do re-resolve. 
+In this case nginx will resolve ``api.com`` once at startup with system resolver and then never do re-resolve.
 
 Use variables everywhere to make it work as expected:
 
@@ -110,7 +110,31 @@ Use variables everywhere to make it work as expected:
       resolver 8.8.8.8 valid=60s;
       proxy_pass https://$endpoint/;
   }
+
+Will upstream save my life?
+---------------------------
+
+If you're using nginx plus, you can use ``resolve`` parameter, `check out docs <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assumes it will be efficient, because documentation says "monitors", while solutions listed above will query DNS on request. But if you're using open source nginx, no honey is available for you. No money - no honey.
+
+Be aware that any domain listed in the upstream will be resolved at startup only.
+
+.. code:: nginx
   
+  upstream test {
+     server test.example.com;
+  }
+
+  server {
+    listen      80;
+    server_name fillo.me;
+
+    location ~ ^/(?<dest_proxy>[\w-]+)(/(?<path_proxy>.*))? {
+        resolver 8.8.8.8 valid=60s;
+        proxy_pass https://${dest_proxy}.example.com${path_proxy}$is_args$args;
+    }
+  }
+
+This configuration proxies ``http://fillo.me/[name]/[something]/[else]/`` to the ``https://[name].example.com/[something]/[else]/``. All will work as expected with resolving every 60s, but ``http://fillo.me/test/`` will request ``https://test.example.com/`` without resolving, because ``test.example.com`` will be resolved at nginx startup, even if that upstream isn't used.
 
 Perfomance
 ==========
