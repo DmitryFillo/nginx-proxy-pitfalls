@@ -143,6 +143,7 @@ If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
 But with:
 
 .. code:: nginx
+
   upstream test {
     server test.example.com:443;
   }
