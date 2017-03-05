@@ -118,7 +118,7 @@ Use variables everywhere to make it work as expected:
       proxy_pass https://$endpoint/;
   }
 
-You can move ``set`` and ``resolver`` to the ``server`` or ``http`` directives to avoid copy-paste (also I assume that it will increase perfomance a bit, but I haven't tested it).
+You can move ``set`` and ``resolver`` to the ``server`` or ``http`` (or use ``include``) directives to avoid copy-paste (also I assume that it will increase perfomance a bit, but I haven't tested it).
 
 Will ``upstream`` save my life?
 -------------------------------
