@@ -191,4 +191,5 @@ Further research
 ================
 
 * `This issue <https://trac.nginx.org/nginx/ticket/723>`_ says that changing HTTPS to the HTTP helps. Check how protocol changes affects examples above.
+* Compare perfomance with and without resolving.
 * Compare perfomance with different variables scope.
