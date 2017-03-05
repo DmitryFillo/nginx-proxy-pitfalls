@@ -185,7 +185,7 @@ Tested on
 * 1.9.6
 * 1.10.1 (partially, without upstreams interesting behaviour)
 
-I assume it work for wide range of versions.
+I assume it works with wide range of versions.
 
 Further research
 ================
