@@ -2,7 +2,7 @@
 nginx proxy_pass resolver pitfalls
 ==================================
 
-If you're using proxy_pass and your endpoint's IPs can vary in time, please read it to avoid misunderstandings about how nginx works.
+If you're using proxy_pass and your endpoint's IPs can vary in time, please read it to avoid misunderstandings about how nginx works. It was checked on ``nginx/1.9.6`` and ``nginx/1.10.1``, but I assume it work for wide range of versions.
 
 .. contents::
 
@@ -116,7 +116,10 @@ Will upstream save my life?
 
 If you're using nginx plus, you can use ``resolve`` parameter, `check out docs <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assumes it will be efficient, because documentation says "monitors", while solutions listed above will query DNS on request. But if you're using open source nginx, no honey is available for you. No money - no honey.
 
-But there is interesting behaviour. Imagine:
+Interesting about upstreams
+---------------------------
+
+Imagine this configuration:
 
 .. code:: nginx
   
@@ -134,13 +137,21 @@ But there is interesting behaviour. Imagine:
     }
   }
 
-This configuration proxies ``http://fillo.me/[name]/[something]/[else]/`` to the ``https://[name].example.com/[something]/[else]/``. Also it proxites ``http://fillo.me/test_version/`` to the ``https://test.example.com/stats/dev1/``.
+.. list-table::
+   :header-rows: 1
 
-If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
-If you open ``http://fillo.me/test/version`` then NO resolve will be done, because of nginx resolved it at startup.
-If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
+   * - Proxy from
+     - Proxy to
+   * - ``http://fillo.me/[name]/[something]/[else]/``
+     - ``https://[name].example.com/[something]/[else]/``
+   * - ``http://fillo.me/test_version/``
+     - ``https://test.example.com/stats/dev1/``
 
-But with:
+* If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
+* If you open ``http://fillo.me/test/version`` then NO resolve will be done, because of nginx resolved it at startup.
+* If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
+
+But we can fix it with upstream:
 
 .. code:: nginx
 
@@ -163,9 +174,9 @@ But with:
     }
   }
 
-If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
-If you open ``http://fillo.me/test/version`` then it will work as expected.
-If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
+* If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
+* If you open ``http://fillo.me/test/version`` then it will work as expected.
+* If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
 
 So very interesting this can be done with upstream:
 
