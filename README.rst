@@ -12,7 +12,7 @@ TL;DR
 If you want to force nginx resolving your endpoints, you should:
 
 * Use variables with proxy_pass, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or from location regexp.
-* Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move it to the ``upstream`` for that location and will work as expected.
+* Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move it to the ``upstream`` for that location to make resolving work as expected.
 
 But I recommend to read all article, because it's interesting.
 
