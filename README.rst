@@ -134,7 +134,7 @@ Interesting ``upstream`` behaviour
     listen      80;
     server_name fillo.me;
 
-    location /api_version/ {
+    location = /api_version/ {
         proxy_pass https://version.api.com/version/;
     }
 
@@ -175,7 +175,7 @@ But it can be fixed with ``upstream``:
          proxy_set_header Host version.api.com;
       }
 
-      location ~ ^/(?<dest_proxy>[\w-]+)(?:/(?<path_proxy>.*))? {
+      location ~ ^/api/(?<dest_proxy>[\w-]+)(?:/(?<path_proxy>.*))? {
           resolver 8.8.8.8 valid=60s;
           proxy_pass https://${dest_proxy}.example.com/${path_proxy}$is_args$args;
       }
