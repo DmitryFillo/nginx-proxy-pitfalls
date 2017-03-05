@@ -156,7 +156,7 @@ Interesting ``upstream`` behaviour
 
 * If you will open http://fillo.me/api_version/ then no resolve will be done, because of nginx resolved version.api.com at startup.
 * If you will open http://fillo.me/api/version/version/ then NO resolve will be done, because of nginx resolved version.api.com at startup (described above).
-* If you will open http://fillo.me/api/checkout/items/ then it will work as expected.
+* If you will open http://fillo.me/api/checkout/items/ then it will work as expected (resolve occurs).
 
 But it can be fixed with ``upstream``:
 
