@@ -183,7 +183,7 @@ Tested on
 =========
 
 * 1.9.6
-* 1.10.1 (partially, without upstreams interesting behaviour)
+* 1.10.1
 
 I assume it works with wide range of versions.
 
