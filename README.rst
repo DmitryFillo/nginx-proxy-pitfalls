@@ -33,7 +33,7 @@ Trying to find solution
 Add a resolver directive
 ------------------------
 
-You can check `official nginx documentation <http://nginx.org/en/docs/>`_ and find `resolver <http://nginx.org/en/docs/http/ngx_http_core_module.html#resolver>`_ directive.
+You can check `official nginx documentation <http://nginx.org/en/docs/>`_ and find `resolver <http://nginx.org/en/docs/http/ngx_http_core_module.html#resolver>`_ directive:
 
 .. code:: nginx
 
