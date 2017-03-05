@@ -120,45 +120,39 @@ Use variables everywhere to make it work as expected:
 
 You can move ``set`` and ``resolver`` to the ``server`` or ``http`` (or use ``include``) directives to avoid copy-paste (also I assume that it will increase perfomance a bit, but I haven't tested it).
 
-Will ``upstream`` save my life?
--------------------------------
+Upstreams
+=========
 
 If you're using nginx plus, you can use ``resolve`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular request. But if you're using open source nginx, no honey is available for you. No money — no honey.
 
-Interesting ``upstream`` behaviour
-----------------------------------
+You can have both resolve and non-resolve locations
+---------------------------------------------------
 
 .. code:: nginx
-  
-  server {
-    listen      80;
-    server_name fillo.me;
 
-    location = /api_version/ {
-        proxy_pass https://version.api.com/version/;
-    }
-
-    location ~ ^/api/(?<dest_proxy>[\w-]+)(/(?<path_proxy>.*))? {
-        resolver 8.8.8.8 valid=60s;
-        proxy_pass https://${dest_proxy}.api.com/${path_proxy}$is_args$args;
-    }
+  upstream api {
+      server api.com:443;
   }
 
-.. list-table::
-   :header-rows: 1
+  server {
+      listen      80;
+      server_name fillo.me;
 
-   * - Proxy from
-     - Proxy to
-   * - http://fillo.me/api/[name]/[something]/[else]/
-     - https://[name].api.com/[something]/[else]/
-   * - http://fillo.me/api_version/
-     - https://api.com/version/
+      location /api-with-resolve/ {
+         set $endpoint api.com;
+         resolver 8.8.8.8 valid=1s;
+         proxy_pass https://$endpoint/;
+      }
 
-* If you will open http://fillo.me/api_version/ then no resolve will be done, because of nginx resolved version.api.com at startup.
-* If you will open http://fillo.me/api/version/version/ then NO resolve will be done, because of nginx resolved version.api.com at startup (described above).
-* If you will open http://fillo.me/api/checkout/items/ then it will work as expected (resolve occurs).
+      location /api-without-resolve/ {
+         proxy_pass https://api/;
+         proxy_set_header Host api.com;
+      }
+  }
 
-But it can be fixed with ``upstream``:
+Yes, http://fillo.me/api-with-resolve/ will resolve api.com every 1s on particular request, while http://fillo.me/api-without-resolve/ will not resolve api.com after startup (or reload).
+
+Another example:
 
 .. code:: nginx
 
@@ -184,30 +178,6 @@ But it can be fixed with ``upstream``:
 * If you will open http://fillo.me/api_version/ then no resolve will be done, because of nginx resolved version.api.com at startup.
 * If you will open http://fillo.me/api/version/version/ then it will work as expected, nginx will resolve version.api.com every 60s on particular request.
 * If you will open http://fillo.me/api/checkout/items/ then it will work as expected, nginx will resolve checkout.api.com every 60s on particular request.
-
-So, very interesting can be done with ``upstream``:
-
-.. code:: nginx
-
-  upstream api {
-      server api.com:443;
-  }
-
-  server {
-      listen      80;
-      server_name fillo.me;
-
-      location /api-with-resolve/ {
-         set $endpoint api.com;
-         resolver 8.8.8.8 valid=1s;
-         proxy_pass https://$endpoint/;
-      }
-
-      location /api-without-resolve/ {
-         proxy_pass https://api/;
-         proxy_set_header Host api.com;
-      }
-  }
 
 Tested on
 =========
