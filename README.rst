@@ -116,17 +116,17 @@ Will upstream save my life?
 
 If you're using nginx plus, you can use ``resolve`` parameter, `check out docs <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assumes it will be efficient, because documentation says "monitors", while solutions listed above will query DNS on request. But if you're using open source nginx, no honey is available for you. No money - no honey.
 
-Be aware that any domain listed in the upstream will be resolved at startup only.
+But there is interesting behaviour. Imagine:
 
 .. code:: nginx
   
-  upstream test {
-     server test.example.com;
-  }
-
   server {
     listen      80;
     server_name fillo.me;
+
+    location = /test_version/ {
+       proxy_pass https://test.example.com/stats/dev1/;
+    }
 
     location ~ ^/(?<dest_proxy>[\w-]+)(/(?<path_proxy>.*))? {
         resolver 8.8.8.8 valid=60s;
@@ -134,7 +134,61 @@ Be aware that any domain listed in the upstream will be resolved at startup only
     }
   }
 
-This configuration proxies ``http://fillo.me/[name]/[something]/[else]/`` to the ``https://[name].example.com/[something]/[else]/``. All will work as expected with resolving every 60s, but ``http://fillo.me/test/`` will request ``https://test.example.com/`` without resolving, because ``test.example.com`` will be resolved at nginx startup, even if that upstream isn't used.
+This configuration proxies ``http://fillo.me/[name]/[something]/[else]/`` to the ``https://[name].example.com/[something]/[else]/``. Also it proxites ``http://fillo.me/test_version/`` to the ``https://test.example.com/stats/dev1/``.
+
+If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
+If you open ``http://fillo.me/test/version`` then NO resolve will be done, because of nginx resolved it at startup.
+If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
+
+But with:
+
+.. code:: nginx
+  upstream test {
+    server test.example.com:443;
+  }
+
+  server {
+    listen      80;
+    server_name fillo.me;
+
+    location = /test_version/ {
+       proxy_pass https://test/stats/dev1/;
+       proxy_set_header Host test.example.com;
+    }
+
+    location ~ ^/(?<dest_proxy>[\w-]+)(/(?<path_proxy>.*))? {
+        resolver 8.8.8.8 valid=60s;
+        proxy_pass https://${dest_proxy}.example.com${path_proxy}$is_args$args;
+    }
+  }
+
+If you open ``http://fillo.me/test_vesrion`` then no resolve will be done, because of nginx resolved it at startup.
+If you open ``http://fillo.me/test/version`` then it will work as expected.
+If you open ``http://fillo.me/test_xxx/version`` then it will work as expected.
+
+So very interesting this can be done with upstream:
+
+.. code:: nginx
+
+    upstream api {
+      server api.com:443;
+    }
+
+    server {
+        listen 80;
+        server_name fillo.me;
+
+        location /api-with-resolve/ {
+           set $endpoint api.com;
+           resolver 8.8.8.8 valid=1s;
+           proxy_pass https://$endpoint/;
+        }
+
+        location /api-without-resolve/ {
+           proxy_pass https://api/;
+           proxy_set_header Host api.com;
+        }
+    }
 
 Perfomance
 ==========
