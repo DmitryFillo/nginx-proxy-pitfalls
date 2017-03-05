@@ -128,8 +128,6 @@ If you're using nginx plus, you can use ``resolve`` parameter, `check out docume
 Interesting ``upstream`` behaviour
 ----------------------------------
 
-Imagine configuration:
-
 .. code:: nginx
   
   server {
@@ -157,7 +155,7 @@ Imagine configuration:
      - https://api.com/version/
 
 * If you will open http://fillo.me/api_version/ then no resolve will be done, because of nginx resolved version.api.com at startup.
-* If you will open http://fillo.me/api/version/version/ then NO resolve will be done, because of nginx resolved version.api.com at startup.
+* If you will open http://fillo.me/api/version/version/ then NO resolve will be done, because of nginx resolved version.api.com at startup (described above).
 * If you will open http://fillo.me/api/checkout/items/ then it will work as expected.
 
 But it can be fixed with ``upstream``:
