@@ -150,7 +150,7 @@ You can have both resolve and non-resolve locations
       }
   }
 
-Yes, http://fillo.me/api-with-resolve/ will resolve api.com every 1s on particular request, while http://fillo.me/api-without-resolve/ will not resolve api.com after startup (or reload).
+Yes, http://fillo.me/api-with-resolve/ will resolve api.com every 1s on particular request, while http://fillo.me/api-without-resolve/ will not resolve api.com after startup (or reload). This will not work without ``upstream``.
 
 Another example:
 
