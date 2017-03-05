@@ -102,7 +102,7 @@ Caveats
 
 In this case nginx will resolve api.com once at startup with system resolver and then will never do re-resolve even for /api/ requests. *Example with /api_version/ is just synthetic example, you can use more complex scenarios with headers set, etc.*
 
-You can use variables everywhere to make it work as expected:
+Use variables everywhere to make it work as expected:
 
 .. code:: nginx
 
