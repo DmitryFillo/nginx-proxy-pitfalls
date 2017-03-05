@@ -191,10 +191,7 @@ So very interesting this can be done with upstream:
         }
     }
 
-Perfomance
-==========
+Further research
+================
 
-TODO (anycast)
-TODO (http)
-TODO (upstream)
-write about resolve
+* At `this issue <https://trac.nginx.org/nginx/ticket/723>`_ man says that changing https to the https helps. Check how protocol changes affects examples above.
