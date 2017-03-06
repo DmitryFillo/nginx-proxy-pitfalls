@@ -13,7 +13,7 @@ If you want to force nginx resolving your endpoints, you should:
 
 * Use variables with proxy_pass, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or from location regexp.
 * Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move it to the ``upstream`` or use variables for that location to make resolving work as expected.
-* `You can have both resolve and non-resolve locations for same domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls#you-can-have-both-resolve-and-non-resolve-locations>`_.
+* `You can have both resolve and non-resolve locations for same domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls/blob/master/README.rst#you-can-have-both-resolve-and-non-resolve-locations-for-same-domain>`_.
 
 But I recommend to read all article, because it's interesting.
 
