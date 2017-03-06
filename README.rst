@@ -61,8 +61,8 @@ You can google a bit and find that `nginx try to resolve proxy endpoint with var
 
 .. code:: nginx
 
-  location /api/ {
-      set $endpoint api.com;
+  location = /proxy/ {
+      set $endpoint proxy.com;
       resolver 8.8.8.8 valid=10s;
       proxy_pass https://$endpoint/;
   }
@@ -72,9 +72,9 @@ Works as expected. These configurations works too:
 .. code:: nginx
 
   set $endpoint api.com;
-  location /api/ {
+  location ~ ^/api/(.*)$ {
       resolver 8.8.8.8 valid=60s;
-      proxy_pass https://$endpoint/;
+      proxy_pass https://$endpoint/$1$is_args$args;
   }
   
 .. code:: nginx
@@ -91,14 +91,14 @@ Caveats
 
 .. code:: nginx
 
-  location /api_version/ {
+  location = /api_version/ {
       proxy_pass https://api.com/version/;
   }
 
-  location /api/ {
+  location ~ ^/api/(.*)$ {
       set $endpoint api.com;
       resolver 8.8.8.8 valid=60s;
-      proxy_pass https://$endpoint/;
+      proxy_pass https://$endpoint/$1$is_args$args;
   }
 
 In this case nginx will resolve api.com once at startup with system resolver and then will never do re-resolve even for /api/ requests. *Example with /api_version/ is just synthetic example, you can use more complex scenarios with headers set, etc.*
@@ -107,16 +107,16 @@ Use variables everywhere to make it work as expected:
 
 .. code:: nginx
 
-  location /api_version/ {
+  location = /api_version/ {
       set $endpoint api.com;
       resolver 8.8.8.8 valid=60s;
       proxy_pass https://$endpoint/version/;
   }
 
-  location /api/ {
+  location ~ ^/api/(.*)$ {
       set $endpoint api.com;
       resolver 8.8.8.8 valid=60s;
-      proxy_pass https://$endpoint/;
+      proxy_pass https://$endpoint/$1$is_args$args;
   }
 
 You can move ``set`` and ``resolver`` to the ``server`` or ``http`` (or use ``include``) directives to avoid copy-paste (also I assume that it will increase perfomance a bit, but I haven't tested it).
@@ -131,27 +131,27 @@ You can have both resolve and non-resolve locations for one domain
 
 .. code:: nginx
 
-  upstream api {
-      server api.com:443;
+  upstream proxy {
+      server proxy.com:443;
   }
 
   server {
       listen      80;
       server_name fillo.me;
 
-      location /api-with-resolve/ {
-         set $endpoint api.com;
+      location = /proxy-with-resolve/ {
+         set $endpoint proxy.com;
          resolver 8.8.8.8 valid=1s;
          proxy_pass https://$endpoint/;
       }
 
-      location /api-without-resolve/ {
-         proxy_pass https://api/;
-         proxy_set_header Host api.com;
+      location = /proxy-without-resolve/ {
+         proxy_pass https://proxy/;
+         proxy_set_header Host proxy.com;
       }
   }
 
-Yes, http://fillo.me/api-with-resolve/ will resolve api.com every 1s on particular request, while http://fillo.me/api-without-resolve/ will not resolve api.com after startup (or reload). This will not work without ``upstream``.
+Yes, http://fillo.me/proxy-with-resolve/ will resolve proxy.com every 1s on particular request, while http://fillo.me/proxy-without-resolve/ will not resolve proxy.com after startup (or reload). This will not work without ``upstream``.
 
 Another example:
 
