@@ -67,7 +67,7 @@ You can google a bit and find that `nginx try to resolve proxy endpoint with var
       proxy_pass https://$endpoint/;
   }
 
-Works as expected. These configurations works too:
+Works as expected, nginx will query proxy.com every 10s on particular requests. These configurations works too:
 
 .. code:: nginx
 
