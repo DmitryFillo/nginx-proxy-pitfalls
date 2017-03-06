@@ -9,13 +9,13 @@ If you're using ``proxy_pass`` and your endpoint's IPs can vary in time, please 
 TL;DR
 =====
 
-If you want to force nginx resolving your endpoints, you should:
+If you want to force nginx resolve your endpoints, you should:
 
-* Use variables with proxy_pass, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or from location regexp.
-* Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move it to the ``upstream`` or use variables for that location to make resolving work as expected.
+* Use variables with ``proxy_pass``, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or extracted from location regexp.
+* Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move endpoint domain to the ``upstream`` or use variables in the ``proxy_pass`` in that location to make resolving works.
 * `You can have both resolve and non-resolve locations for same domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls/blob/master/README.rst#you-can-have-both-resolve-and-non-resolve-locations-for-same-domain>`_.
 
-But I recommend to read all article, because it's interesting.
+But I recommend to read full article, because it's interesting.
 
 Explanatory example
 ===================
@@ -52,7 +52,7 @@ No, it will not work. Even this will not work:
       proxy_pass https://api.com/;
   }
 
-It's because of nginx doesn't respect ``resolver`` directive in this case. It will resolve api.com only at startup (or reload) by system resolver (/etc/resolv.conf) anyway, even if real TTL of A/AAAA record api.com is 1s.
+It's because of nginx doesn't respect ``resolver`` directive in this case. It will resolve api.com only at startup (or reload) by system resolver (/etc/resolv.conf), even if real TTL of A/AAAA record api.com is 1s.
 
 Add variables
 -------------
@@ -124,7 +124,7 @@ You can move ``set`` and ``resolver`` to the ``server`` or ``http`` (or use ``in
 Upstreams
 =========
 
-If you're using nginx plus, you can use ``resolve`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular request. But if you're using open source nginx, no honey is available for you. No money — no honey.
+If you're using nginx plus, you can use ``resolve`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular requests. But if you're using open source nginx, no honey is available for you. No money — no honey.
 
 You can have both resolve and non-resolve locations for same domain
 -------------------------------------------------------------------
@@ -151,7 +151,7 @@ You can have both resolve and non-resolve locations for same domain
       }
   }
 
-Yes, http://fillo.me/proxy-with-resolve/ will resolve proxy.com every 1s on particular request, while http://fillo.me/proxy-without-resolve/ will not resolve proxy.com after startup (or reload). This will not work without ``upstream``.
+Yes, http://fillo.me/proxy-with-resolve/ will resolve proxy.com every 1s on particular requests, while http://fillo.me/proxy-without-resolve/ will not resolve proxy.com (nginx will resolve proxy.com at startup/reload once). This magic works because ``upstream`` directive is used.
 
 Another example:
 
@@ -186,11 +186,11 @@ Tested on
 * 1.9.6
 * 1.10.1
 
-I assume it works with wide range of versions.
+Although I think it works for many other versions.
 
 Further research
 ================
 
 * `This issue <https://trac.nginx.org/nginx/ticket/723>`_ says that changing HTTPS to the HTTP helps. Check how protocol changes affects examples above.
 * Compare perfomance with and without resolving.
-* Compare perfomance with different variables scope.
+* Compare perfomance with different variables scopes.
