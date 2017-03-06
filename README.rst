@@ -13,7 +13,7 @@ If you want to force nginx resolving your endpoints, you should:
 
 * Use variables with proxy_pass, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or from location regexp.
 * Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move it to the ``upstream`` or use variables for that location to make resolving work as expected.
-* `You can have both resolve and non-resolve locations for one domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls#you-can-have-both-resolve-and-non-resolve-locations>`_.
+* `You can have both resolve and non-resolve locations for same domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls#you-can-have-both-resolve-and-non-resolve-locations>`_.
 
 But I recommend to read all article, because it's interesting.
 
@@ -126,8 +126,8 @@ Upstreams
 
 If you're using nginx plus, you can use ``resolve`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular request. But if you're using open source nginx, no honey is available for you. No money — no honey.
 
-You can have both resolve and non-resolve locations for one domain
-------------------------------------------------------------------
+You can have both resolve and non-resolve locations for same domain
+-------------------------------------------------------------------
 
 .. code:: nginx
 
