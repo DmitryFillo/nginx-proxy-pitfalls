@@ -158,7 +158,7 @@ Another example:
 .. code:: nginx
 
   upstream api_version {
-      server version.example.com:443;
+      server version.api.com:443;
   }
 
   server {
@@ -172,7 +172,7 @@ Another example:
 
       location ~ ^/api/(?<dest_proxy>[\w-]+)(?:/(?<path_proxy>.*))? {
           resolver 8.8.8.8 valid=60s;
-          proxy_pass https://${dest_proxy}.example.com/${path_proxy}$is_args$args;
+          proxy_pass https://${dest_proxy}.api.com/${path_proxy}$is_args$args;
       }
   }
 
