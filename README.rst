@@ -2,7 +2,7 @@
 NGINX proxy pitfalls with DNS resolving
 ========================================
 
-If you're using ``proxy_pass`` and your endpoint's IPs can vary in time, please read this article to avoid misunderstandings about how nginx works. 
+If you're using ``proxy_pass`` and your endpoint's IPs can vary in time, please read this article to avoid misunderstandings about how nginx works.
 
 .. contents::
 
@@ -76,14 +76,14 @@ Works as expected, nginx will query proxy.com every 10s on particular requests. 
       resolver 8.8.8.8 valid=60s;
       proxy_pass https://$endpoint/$1$is_args$args;
   }
-  
+
 .. code:: nginx
 
   location ~ ^/(?<dest_proxy>[\w-]+)(?:/(?<path_proxy>.*))? {
       resolver 8.8.8.8 ipv6=off valid=60s;
       proxy_pass https://${dest_proxy}.example.com/${path_proxy}$is_args$args;
   }
-  
+
 Notice that nginx will start even without ``resolver`` directive, but will fail with 502 at runtime, because "no resolver defined to resolve".
 
 Caveats
@@ -120,6 +120,24 @@ Use variables everywhere to make it work as expected:
   }
 
 You can move ``set`` and ``resolver`` to the ``server`` or ``http`` (or use ``include``) directives to avoid copy-paste (also I assume that it will increase perfomance a bit, but I haven't tested it).
+
+If response from proxy contains ``Location`` header, as in the case of a redirect, nginx will automatically replace these values as needed. However, if variables are used in ``proxy_pass``, this must be done explicitly via ``proxy_redirect``:
+
+.. code:: nginx
+
+  location = /api_version/ {
+      set $endpoint api.com;
+      resolver 8.8.8.8 valid=60s;
+      proxy_pass https://$endpoint/version/;
+      proxy_redirect https://$endpoint/ /;
+  }
+
+  location ~ ^/api/(.*)$ {
+      set $endpoint api.com;
+      resolver 8.8.8.8 valid=60s;
+      proxy_pass https://$endpoint/$1$is_args$args;
+      proxy_redirect https://$endpoint/ /;
+  }
 
 Upstreams
 =========
