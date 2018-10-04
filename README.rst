@@ -1,6 +1,6 @@
-========================================
-NGINX proxy pitfalls with DNS resolving
-========================================
+===============================================
+NGINX proxy pitfalls related with DNS resolving
+===============================================
 
 If you're using ``proxy_pass`` and your endpoint's IPs can vary in time, please read this article to avoid misunderstandings about how nginx works.
 
