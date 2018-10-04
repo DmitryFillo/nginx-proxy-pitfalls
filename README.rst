@@ -11,9 +11,10 @@ TL;DR
 
 If you want to force nginx resolve your endpoints, you should:
 
-* Use variables with ``proxy_pass``, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or extracted from location regexp.
-* Make sure that your endpoint isn't used in the another locations, because it will break resolving. Move endpoint domain to the ``upstream`` or use variables in the ``proxy_pass`` in that location to make resolving works.
+* Use variables within ``proxy_pass`` directive, e.g. ``proxy_pass https://$endpoint/;``, where ``$endpoint`` can be manually setted or extracted from location regexp. `Read more <https://github.com/DmitryFillo/nginx-proxy-pitfalls#add-variables>`_.
+* Make sure that your endpoint isn't used in the another locations w/o variables, because in this case resolving won't work. To fix this move endpoint domain to the ``upstream`` or use variables in the ``proxy_pass`` in all locations to make resolving works. `Read more <https://github.com/DmitryFillo/nginx-proxy-pitfalls#caveats>`_.
 * `You can have both resolve and non-resolve locations for same domain <https://github.com/DmitryFillo/nginx-proxy-pitfalls/blob/master/README.rst#you-can-have-both-resolve-and-non-resolve-locations-for-same-domain>`_.
+* When a variable is used in proxy_pass directive, the location header is not longer adjusted. To get around this, simply set ``proxy_redirect``. `Read more <https://github.com/DmitryFillo/nginx-proxy-pitfalls#caveats>`_.
 
 But I recommend to read full article, because it's interesting.
 
@@ -28,8 +29,8 @@ Explanatory example
 
 In this case nginx will resolve api.com only once at startup (or reload). But there are some cases when your endpoint can be resolved to any IP, e.g. if you're using load balancer which doing magic failover via DNS mapping. If api.com will point to another IP your proxying will fail.
 
-Trying to find solution
-=======================
+Finding the solution
+====================
 
 Add a resolver directive
 ------------------------
@@ -138,6 +139,10 @@ If response from proxy contains ``Location`` header, as in the case of a redirec
       proxy_pass https://$endpoint/$1$is_args$args;
       proxy_redirect https://$endpoint/ /;
   }
+
+Single line in `nginx docs <http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_redirect>`_ that mention it:
+    
+    The default parameter is not permitted if proxy_pass is specified using variables.
 
 Upstreams
 =========
