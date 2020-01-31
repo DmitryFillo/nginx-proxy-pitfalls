@@ -147,7 +147,7 @@ Single line in `nginx docs <http://nginx.org/en/docs/http/ngx_http_proxy_module.
 Upstreams
 =========
 
-If you're using nginx plus, you can use ``resolve`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular requests. But if you're using open source nginx, no honey is available for you. No money — no honey.
+If you're using nginx plus, you can use ``resolver`` parameter, `check out documentation <http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server>`_. I assume that it will be efficient, because documentation says "monitors changes of the IP addresses that correspond to a domain name of the server", while solutions listed above will query DNS on the particular requests. But if you're using open source nginx, no honey is available for you. No money — no honey.
 
 You can have both resolve and non-resolve locations for same domain
 -------------------------------------------------------------------
@@ -174,7 +174,7 @@ You can have both resolve and non-resolve locations for same domain
       }
   }
 
-Yes, http://fillo.me/proxy-with-resolve/ will resolve proxy.com every 1s on particular requests, while http://fillo.me/proxy-without-resolve/ will not resolve proxy.com (nginx will resolve proxy.com at startup/reload once). This magic works because ``upstream`` directive is used.
+Yes, http://fillo.me/proxy-with-resolve/ will resolve proxy.com every 1s on particular requests, while http://fillo.me/proxy-without-resolver/ will not resolve proxy.com (nginx will resolve proxy.com at startup/reload once). This magic works because ``upstream`` directive is used.
 
 Another example:
 
